@@ -2,73 +2,102 @@
 
 ##############################################################################
 ##
-##  Gradle start up script for UN*X
+##  Gradle wrapper script for UNIX
 ##
 ##############################################################################
 
-# Resolve links - $0 may be a softlink
+# Attempt to set APP_HOME
+# Resolve links: $0 may be a link
 PRG="$0"
+APP_HOME=`dirname "$PRG"`
 
-while [ -h "$PRG" ]; do
-  LS=`ls -ld "$PRG"`
-  LINK=`expr "$LS" : '.*-> \(.*\)$'`
-  if expr "$LINK" : '/.*' > /dev/null; then
-    PRG="$LINK"
-  else
-    PRG=`dirname "$PRG"`/"$LINK"
-  fi
+# Need this for relative symlinks
+while [ -h "$PRG" ] ; do
+    LS=`ls -ld "$PRG"`
+    LINK=`expr "$LS" : '.*-> \(.*\)$'`
+    if expr "$LINK" : '/.*' > /dev/null; then
+        PRG="$LINK"
+    else
+        PRG=`dirname "$PRG"`/"$LINK"
+    fi
 done
 
 APP_HOME=`dirname "$PRG"`
+APP_HOME=`cd "$APP_HOME" && pwd`
 
-# OOM for the JVM
-DEFAULT_JVM_OPTS="-Xmx64m -Xms64m"
+# OS specific support (must be 'true' or 'false').
+cygwin=false
+darwin=false
+mingw=false
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+  Darwin*) darwin=true
+           if [ -z "$JAVA_HOME" ]; then
+             if [ -x '/usr/libexec/java_home' ]; then
+               export JAVA_HOME=`/usr/libexec/java_home`
+             elif [ -d '/Library/Java/Home' ]; then
+               export JAVA_HOME='/Library/Java/Home'
+             fi
+           fi
+           ;;
+  MINGW*) mingw=true ;;
+esac
 
-# Add default JVM options here. You can also use the GRADLE_JVM_OPTS environment variable.
-# On Darwin (macOS), the user's default locale can be malformed, which causes the JVM to fail.
-# https://github.com/gradle/gradle/issues/21714
-if [ "$(uname -s)" = "Darwin" ]; then
-    if [ -z "$LC_ALL" ] && [ -z "$LANG" ]; then
-        DEFAULT_JVM_OPTS="$DEFAULT_JVM_OPTS -Duser.language=en"
-        DEFAULT_JVM_OPTS="$DEFAULT_JVM_OPTS -Duser.country=US"
-    fi
+# For Darwin, add options to allow Java to be still run on older Java versions
+if $darwin; then
+  DEFAULT_JVM_OPTS="-Xdock:name=Gradle -Xdock:icon=\"$APP_HOME/gradle/wrapper/gradle-wrapper.jar\""
 fi
 
-if [ "x$GRADLE_JVM_OPTS" != "x" ]; then
-    JVM_OPTS="$GRADLE_JVM_OPTS"
-fi
-
-if [ "x$JVM_OPTS" = "x" ]; then
-    JVM_OPTS="$DEFAULT_JVM_OPTS"
-fi
-
-# Determine the Java command to run.
-if [ -n "$JAVA_HOME" ]; then
-  if [ -x "$JAVA_HOME/jre/sh/java" ]; then
+# Determine the Java command to use to start the JVM.
+if [ -n "$JAVA_HOME" ] ; then
+  if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
     # IBM's JDK on AIX uses "$JAVA_HOME/jre/sh/java" as the actual executable.
-    JAVA_EXE="$JAVA_HOME/jre/sh/java"
-  elif [ -x "$JAVA_HOME/bin/java" ]; then
-    JAVA_EXE="$JAVA_HOME/bin/java"
+    JAVA_CMD="$JAVA_HOME/jre/sh/java"
   else
-    echo "Warning: JAVA_HOME exists but Java binary not found." >&2
+    JAVA_CMD="$JAVA_HOME/bin/java"
   fi
-elif type -p java > /dev/null; then
-    JAVA_EXE=java
+  if [ ! -x "$JAVA_CMD" ] ; then
+    die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
+
+Please set the JAVA_HOME environment variable to the root directory of your Java installation."
+  fi
 else
-    echo "Error: JAVA_HOME is not set and no 'java' command can be found in your PATH." >&2
-    echo "       Please set the JAVA_HOME variable in your environment to match the location of your Java installation." >&2
-    exit 1
+  JAVA_CMD="java"
+  # Check for Java in PATH
+  if [ ! `command -v $JAVA_CMD` ]; then
+    die "ERROR: JAVA_HOME is not set and no 'java' command can be found in your PATH.
+
+Please set the JAVA_HOME environment variable to the root directory of your Java installation (or alter your PATH environment variable to include the location of the 'java' executable)."
+  fi
 fi
 
-# Escape application args for Java. It's an array of string literals
-APP_ARGS=""
-for var in "$@"
-do
-    APP_ARGS="$APP_ARGS \"$var\""
-done
+# Add default JVM options for better performance and memory management
+# Ensure this doesn't override user-defined options
+if [ -z "$DEFAULT_JVM_OPTS" ]; then
+  DEFAULT_JVM_OPTS="-Xmx1024m -Dfile.encoding=UTF-8" # Example: 1GB max heap, UTF-8 encoding
+fi
 
-# Split up the JVM_OPTS for the Java command.
-JAVA_OPTS=($JVM_OPTS)
+# The Java system properties and classpath for the wrapper.
+# These will be passed to the JVM that runs the wrapper.
+GRADLE_OPTS=""
+if [ -f "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" ] ; then
+  CLASSPATH="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+else
+  die "ERROR: Cannot find $APP_HOME/gradle/wrapper/gradle-wrapper.jar
+This might indicate a corrupted Gradle distribution. If this is a project that uses the Gradle wrapper, please try to delete the '$APP_HOME/gradle' folder and re-run your build to download a fresh one."
+fi
 
-# Execute Gradle.
-exec "$JAVA_EXE" "${JAVA_OPTS[@]}" -classpath "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" org.gradle.wrapper.GradleWrapperMain $APP_ARGS
+# Stop compiling in-process on older Android Gradle Plugin versions, as they can conflict
+# with newer Gradle versions (e.g. Kotlin compiler version mismatches)
+# This check is not strictly necessary for modern projects, but harmless.
+if [ -n "$ANDROID_GRADLE_PLUGIN_VERSION" ] && [ "$(printf '%s\n' "3.6.0" "$ANDROID_GRADLE_PLUGIN_VERSION" | sort -V | head -n1)" = "3.6.0" ] && [ "$(printf '%s\n' "4.0.0" "$ANDROID_GRADLE_PLUGIN_VERSION" | sort -V | head -n1)" != "4.0.0" ]; then
+    DEFAULT_JVM_OPTS="$DEFAULT_JVM_OPTS -Dorg.gradle.daemon.profile=false -Dorg.gradle.parallel=true -Dorg.gradle.internal.launcher.welcome=full -Dorg.gradle.jvmargs=\"-Xmx1536M -Dfile.encoding=UTF-8 -XX:+HeapDumpOnOutOfMemoryError\" -Dorg.gradle.workers.max=4 -Dorg.gradle.configureondemand=true"
+fi
+
+
+# Main class
+MAIN_CLASS="org.gradle.wrapper.GradleWrapperMain"
+
+# Collect all arguments for the Java command
+# This allows users to pass JVM options via JAVA_OPTS
+exec "$JAVA_CMD" $DEFAULT_JVM_OPTS $JAVA_OPTS -classpath "$CLASSPATH" "$MAIN_CLASS" "$@"
