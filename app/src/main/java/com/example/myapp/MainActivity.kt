@@ -19,6 +19,32 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.myapp.ui.theme.MyAppTheme
 
+// Constants for SharedPreferences
+const val PREFS_NAME = "CopySaverPrefs"
+const val KEY_SAVED_COPIES = "saved_copies"
+
+/**
+ * Saves the list of copied strings to SharedPreferences.
+ * @param context The application context.
+ * @param copies The list of strings to save.
+ */
+fun saveCopies(context: Context, copies: List<String>) {
+    val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    // Convert List<String> to Set<String> for SharedPreferences and save
+    prefs.edit().putStringSet(KEY_SAVED_COPIES, copies.toSet()).apply()
+}
+
+/**
+ * Loads the list of copied strings from SharedPreferences.
+ * @param context The application context.
+ * @return A list of saved strings, or an empty list if none are found.
+ */
+fun loadCopies(context: Context): List<String> {
+    val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    // Load as Set<String> and convert back to List<String>
+    return prefs.getStringSet(KEY_SAVED_COPIES, emptySet())?.toList() ?: emptyList()
+}
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +65,13 @@ class MainActivity : ComponentActivity() {
 fun CopySaverApp() {
     val context = LocalContext.current
     val clipboardManager = remember { context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
-    val savedCopies = remember { mutableStateListOf<String>() }
+
+    // Initialize savedCopies by loading from SharedPreferences
+    val savedCopies = remember {
+        mutableStateListOf<String>().apply {
+            addAll(loadCopies(context))
+        }
+    }
     var currentClipboardContent by remember { mutableStateOf("") }
 
     // Function to update current clipboard content from the system clipboard
@@ -70,7 +102,8 @@ fun CopySaverApp() {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("CopySaver") })
+            // Using SmallTopAppBar for Material3 consistency for a basic app bar
+            SmallTopAppBar(title = { Text("CopySaver") })
         }
     ) { paddingValues ->
         Column(
@@ -100,6 +133,7 @@ fun CopySaverApp() {
                 onClick = {
                     if (currentClipboardContent.isNotBlank() && !savedCopies.contains(currentClipboardContent)) {
                         savedCopies.add(0, currentClipboardContent) // Add to the top of the list
+                        saveCopies(context, savedCopies) // Persist the updated list
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -138,7 +172,10 @@ fun CopySaverApp() {
                                     modifier = Modifier.weight(1f)
                                 )
                                 IconButton(
-                                    onClick = { savedCopies.remove(item) },
+                                    onClick = {
+                                        savedCopies.remove(item)
+                                        saveCopies(context, savedCopies) // Persist the updated list
+                                    },
                                     modifier = Modifier.align(Alignment.Top)
                                 ) {
                                     Icon(Icons.Filled.Delete, contentDescription = "Delete saved item")
