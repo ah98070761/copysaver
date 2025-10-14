@@ -25,5 +25,8 @@ jobs:
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
+      - name: Make Gradle Wrapper Executable
+        run: chmod +x ./gradlew
+
       - name: Assemble Debug Build
-        run: bash ./gradlew assembleDebug
+        run: ./gradlew assembleDebug
