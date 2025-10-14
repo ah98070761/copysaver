@@ -24,9 +24,14 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+          # Validate Gradle wrapper checksums to ensure integrity and re-download if corrupted.
+          # This helps prevent issues where the wrapper JAR might be missing or damaged,
+          # which can lead to "Could not find or load main class" errors.
+          validate-wrappers: true
 
       - name: Make Gradle Wrapper Executable
         run: chmod +x ./gradlew
 
       - name: Assemble Debug Build
-        run: bash ./gradlew assembleDebug
+        # Running ./gradlew directly is sufficient and idiomatic, removing the 'bash' prefix.
+        run: ./gradlew assembleDebug
