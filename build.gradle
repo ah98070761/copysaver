@@ -1,25 +1,46 @@
-buildscript {
-    ext {
-        kotlin_version = '1.9.0'
-        agp_version = '8.2.0'
-    }
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath "com.android.tools.build:gradle:$agp_version"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
+plugins {
+    id 'com.android.application' version '8.2.2' apply false
+    id 'com.android.library' version '8.2.2' apply false
+    id 'org.jetbrains.kotlin.android' version '1.9.0' apply false
+    id 'org.jetbrains.kotlin.jvm' version '1.9.0' apply false
+}
+
+ext {
+    // SDK and tools versions
+    compileSdk = 34
+    minSdk = 24
+    targetSdk = 34
+
+    // Kotlin version (aligned with org.jetbrains.kotlin.android plugin version)
+    kotlin_version = '1.9.0'
+
+    // AndroidX Library Versions
+    androidx_core_ktx = '1.12.0'
+    androidx_lifecycle_runtime_ktx = '2.6.2'
+    androidx_activity_compose = '1.8.2' // If using Jetpack Compose
+    androidx_compose_bom = '2023.08.00' // If using Jetpack Compose
+    // Note: Compose Compiler Extension version is typically defined in module's build.gradle
+    // or via a separate Kotlin plugin setting, e.g., '1.5.8' for Kotlin 1.9.0
+
+    // UI Library Versions
+    material = '1.11.0'
+
+    // Testing Library Versions
+    junit = '4.13.2'
+    androidx_junit_ext = '1.1.5'
+    androidx_espresso_core = '3.5.1'
 }
 
 allprojects {
     repositories {
         google()
         mavenCentral()
+        // If you need any other custom repositories, add them here
+        // maven { url 'https://jitpack.io' }
     }
 }
 
-task clean(type: Delete) {
+// Task to delete the build directory for all modules
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }
