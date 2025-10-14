@@ -7,14 +7,13 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -23,13 +22,8 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }} # Cache is read-only for branches other than main
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build debug APK
+      - name: Run assembleDebug
         run: ./gradlew assembleDebug
