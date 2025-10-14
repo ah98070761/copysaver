@@ -1,6 +1,5 @@
 package com.example.myapp
 
-import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
@@ -13,9 +12,18 @@ import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
+    // Data class to hold copied content and its timestamp
+    data class ClipboardItem(
+        val content: String,
+        val timestamp: String // Store as formatted string
+    )
+
     private lateinit var clipboardManager: ClipboardManager
     private lateinit var lastClipTextView: TextView // TextView to display the last copied item
-    private val savedClips = mutableListOf<String>() // A simple in-memory list to simulate saving copied items
+    private val savedClips = mutableListOf<ClipboardItem>() // List to store ClipboardItem objects
+
+    // Formatter for timestamps, using default locale
+    private val dateFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
     // Listener to detect changes in the primary clip (clipboard)
     private val onPrimaryClipChangedListener = ClipboardManager.OnPrimaryClipChangedListener {
@@ -61,7 +69,7 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Retrieves and displays the current primary clip content.
-     * Also simulates saving the content to an in-memory list.
+     * Also simulates saving the content to an in-memory list with a timestamp.
      */
     private fun displayCurrentClipboardContent() {
         if (clipboardManager.hasPrimaryClip()) {
@@ -69,19 +77,25 @@ class MainActivity : AppCompatActivity() {
             if (clip != null && clip.itemCount > 0) {
                 // Try to get the text from the first item in the clip data
                 // coerceToText handles various clip types and converts them to text
-                val copiedText = clip.getItemAt(0).coerceToText(this).toString()
+                val copiedText = clip.getItemAt(0).coerceToText(this).toString().trim()
+
                 if (copiedText.isNotBlank()) {
-                    lastClipTextView.text = "Last copied: $copiedText"
-                    Toast.makeText(this, "Copied: $copiedText", Toast.LENGTH_SHORT).show()
+                    val currentTimestamp = dateFormatter.format(Date())
+                    val newClipItem = ClipboardItem(copiedText, currentTimestamp)
 
                     // Simulate saving the copied item to our history
                     // Only add if it's new or different from the last saved item to avoid duplicates
-                    if (savedClips.isEmpty() || savedClips.last() != copiedText) {
-                        savedClips.add(copiedText)
+                    // (comparing content only, assuming new timestamp for same content might be desired)
+                    if (savedClips.isEmpty() || savedClips.last().content != newClipItem.content) {
+                        savedClips.add(newClipItem)
                         // In a real application, you would save this to a persistent storage
                         // (e.g., a database like Room, SharedPreferences)
-                        // Log.d("MainActivity", "Saved clip to in-memory history: $copiedText")
+                        // Log.d("MainActivity", "Saved clip: ${newClipItem.content} at ${newClipItem.timestamp}")
                     }
+
+                    // Always display the most recently added or recognized clip
+                    lastClipTextView.text = "Last copied (${newClipItem.timestamp}): ${newClipItem.content}"
+                    Toast.makeText(this, "Copied: ${newClipItem.content}", Toast.LENGTH_SHORT).show()
                 } else {
                     lastClipTextView.text = "No accessible text copied."
                 }
