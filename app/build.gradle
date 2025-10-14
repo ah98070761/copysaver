@@ -6,6 +6,13 @@ plugins {
 }
 
 android {
+
+    sourceSets {
+        main {
+            res.srcDirs = ['src/main/res']
+        }
+    }
+
     namespace 'com.example.copysaver'
     compileSdk 34
 
