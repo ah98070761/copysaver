@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.myapp.ui.theme.MyAppTheme
+import org.json.JSONArray // Added import for JSONArray
 
 // Constants for SharedPreferences
 const val PREFS_NAME = "CopySaverPrefs"
@@ -25,24 +26,48 @@ const val KEY_SAVED_COPIES = "saved_copies"
 
 /**
  * Saves the list of copied strings to SharedPreferences.
+ * To preserve order, the list is serialized to a JSON string.
  * @param context The application context.
  * @param copies The list of strings to save.
  */
 fun saveCopies(context: Context, copies: List<String>) {
     val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    // Convert List<String> to Set<String> for SharedPreferences and save
-    prefs.edit().putStringSet(KEY_SAVED_COPIES, copies.toSet()).apply()
+    val jsonArray = JSONArray()
+    for (copy in copies) {
+        jsonArray.put(copy)
+    }
+    // Store the JSON array as a single string
+    prefs.edit().putString(KEY_SAVED_COPIES, jsonArray.toString()).apply()
 }
 
 /**
  * Loads the list of copied strings from SharedPreferences.
+ * The stored JSON string is deserialized back into a List<String>, preserving order.
  * @param context The application context.
- * @return A list of saved strings, or an empty list if none are found.
+ * @return A list of saved strings, or an empty list if none are found or parsing fails.
  */
 fun loadCopies(context: Context): List<String> {
     val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    // Load as Set<String> and convert back to List<String>
-    return prefs.getStringSet(KEY_SAVED_COPIES, emptySet())?.toList() ?: emptyList()
+    // Retrieve the JSON string
+    val jsonString = prefs.getString(KEY_SAVED_COPIES, null)
+
+    if (jsonString.isNullOrEmpty()) {
+        return emptyList()
+    }
+
+    val copies = mutableListOf<String>()
+    try {
+        val jsonArray = JSONArray(jsonString)
+        for (i in 0 until jsonArray.length()) {
+            copies.add(jsonArray.getString(i))
+        }
+    } catch (e: Exception) {
+        // Handle potential JSON parsing errors (e.g., malformed JSON due to previous data structure)
+        e.printStackTrace()
+        // If parsing fails, return an empty list to prevent app crashes
+        return emptyList()
+    }
+    return copies
 }
 
 class MainActivity : ComponentActivity() {
