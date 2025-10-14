@@ -1,15 +1,14 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    // id("org.jetbrains.kotlin.kapt") // Uncomment if you use KAPT for Room, Dagger, etc.
 }
 
 android {
-    namespace = "com.example.myapplication" // Replace with your actual package name
+    namespace = "com.example.myapplication"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.myapplication" // Replace with your actual application ID
+        applicationId = "com.example.myapplication"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -39,60 +38,18 @@ android {
     }
     buildFeatures {
         viewBinding = true
-        // If you're using Jetpack Compose, uncomment the following line:
-        // compose = true
     }
-    // If you're using Jetpack Compose, uncomment the following block:
-    /*
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1" // Or your current Compose Compiler version
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    */
 }
 
 dependencies {
 
-    // Android Core KTX
     implementation("androidx.core:core-ktx:1.12.0")
-
-    // AppCompat and Material Design
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.10.0")
-
-    // ConstraintLayout
+    implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
-    // Lifecycle components (ViewModel, LiveData)
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
-
-    // Activity KTX for `by viewModels()` delegate and other extensions
-    implementation("androidx.activity:activity-ktx:1.8.2")
-    implementation("androidx.fragment:fragment-ktx:1.6.2")
-
-    // Kotlin Coroutines (often pulled in by other KTX libraries, but good to be explicit if needed)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-
-    // For Compose, if enabled above:
-    // implementation("androidx.activity:activity-compose:1.8.2")
-    // implementation(platform("androidx.compose:compose-bom:2023.08.00")) // Use the latest BOM
-    // implementation("androidx.compose.ui:ui")
-    // implementation("androidx.compose.ui:ui-graphics")
-    // implementation("androidx.compose.ui:ui-tooling-preview")
-    // implementation("androidx.compose.material3:material3")
-    // debugImplementation("androidx.compose.ui:ui-tooling")
-    // debugImplementation("androidx.compose.ui:ui-test-manifest")
-
-    // Unit Testing
     testImplementation("junit:junit:4.13.2")
-
-    // Instrumentation Testing
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
