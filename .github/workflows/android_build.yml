@@ -29,4 +29,8 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Assemble Debug Build
-        run: ./gradlew assembleDebug
+        # The error "Syntax error: "(" unexpected" on ./gradlew:71 often indicates
+        # that the gradlew script is being executed by a shell (like dash, which /bin/sh often links to)
+        # that does not support bash-specific syntax. Explicitly invoking with 'bash'
+        # ensures the script is interpreted by bash.
+        run: bash ./gradlew assembleDebug
