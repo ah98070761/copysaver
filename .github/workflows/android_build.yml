@@ -24,19 +24,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: wrapper
-          # The build log indicates issues with cache restoration and saving.
-          # Explicitly disabling the cache can force a fresh download of the Gradle distribution
-          # if the wrapper JAR is missing or corrupted, potentially resolving
-          # "ClassNotFoundException: org.gradle.wrapper.GradleWrapperMain" errors
-          # which can occur if the distribution isn't properly acquired.
-          cache-disabled: true 
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
       - name: Assemble Debug Build
-        # The error "Syntax error: "(" unexpected" on ./gradlew:71 often indicates
-        # that the gradlew script is being executed by a shell (like dash, which /bin/sh often links to)
-        # that does not support bash-specific syntax. Explicitly invoking with 'bash'
-        # ensures the script is interpreted by bash.
         run: bash ./gradlew assembleDebug
