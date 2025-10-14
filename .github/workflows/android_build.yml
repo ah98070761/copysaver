@@ -28,5 +28,8 @@ jobs:
           # The setup-gradle action manages the Gradle wrapper and executable permissions.
           cache-read-only: ${{ github.ref != 'refs/heads/main' }} # Cache is read-only for non-main branches or PRs.
 
+      - name: Grant execute permission to gradlew
+        run: chmod +x gradlew
+
       - name: Assemble Debug Build
         run: ./gradlew assembleDebug
