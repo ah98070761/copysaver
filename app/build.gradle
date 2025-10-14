@@ -1,5 +1,4 @@
 plugins {
-    // تم التبديل لاستخدام معرفات النص المباشرة بدلاً من Version Catalog
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     // لإضافة Room Kapt
@@ -40,7 +39,7 @@ android {
 
 dependencies {
 
-    // تم التبديل لاستخدام الإحداثيات المباشرة بدلاً من libs.androidx...
+    // إصدارات المكتبات الأساسية
     implementation 'androidx.core:core-ktx:1.13.1'
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
@@ -54,16 +53,19 @@ dependencies {
     // Room for local database (to save copied text)
     def room_version = "2.6.1"
     implementation "androidx.room:room-runtime:$room_version"
-    // يجب استخدام kapt مع الإضافات المباشرة
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
+
+    // Compose Dependencies (تم إضافة الإصدارات: 1.6.0)
+    // نستخدم Compose BOM لتوحيد الإصدارات
+    implementation(platform("androidx.compose:compose-bom:2024.06.00")) 
+    implementation "androidx.activity:activity-compose:1.9.0"
+    implementation 'androidx.compose.material3:material3' 
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    // لتمكين وضع المعاينة
+    debugImplementation 'androidx.compose.ui:ui-tooling' 
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    
-    // Compose Dependencies (لأن MainActivity تستخدمها)
-    implementation "androidx.activity:activity-compose:1.9.0"
-    implementation 'androidx.compose.material3:material3'
-    implementation 'androidx.compose.ui:ui-tooling-preview'
 }
