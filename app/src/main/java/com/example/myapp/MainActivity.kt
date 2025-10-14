@@ -4,8 +4,10 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
+import android.widget.Toast // Added import for Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable // Added import for clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.myapp.ui.theme.MyAppTheme
-import org.json.JSONArray // Added import for JSONArray
+import org.json.JSONArray
 
 // Constants for SharedPreferences
 const val PREFS_NAME = "CopySaverPrefs"
@@ -184,7 +186,14 @@ fun CopySaverApp() {
                 ) {
                     items(savedCopies) { item ->
                         Card(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    // Feature: Copy the saved item back to the system clipboard
+                                    val clip = ClipData.newPlainText("Copied Text", item)
+                                    clipboardManager.setPrimaryClip(clip)
+                                    Toast.makeText(context, "Copied to clipboard!", Toast.LENGTH_SHORT).show()
+                                }
                         ) {
                             Row(
                                 modifier = Modifier
