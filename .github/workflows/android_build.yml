@@ -23,13 +23,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          # This caches Gradle dependencies and build outputs.
-          # No specific permissions are usually needed here beyond default.
-          # The setup-gradle action manages the Gradle wrapper and executable permissions.
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }} # Cache is read-only for non-main branches or PRs.
-
-      - name: Grant execute permission to gradlew
-        run: chmod +x gradlew
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Assemble Debug Build
-        run: ./gradlew assembleDebug
+        run: bash ./gradlew assembleDebug
