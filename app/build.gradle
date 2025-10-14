@@ -1,90 +1,66 @@
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt' // For annotation processing like Hilt, Room, etc.
-    id 'com.google.dagger.hilt.android' // Hilt for Dependency Injection
-    // id 'com.google.gms.google-services' // Uncomment if your project uses Firebase
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
 }
 
 android {
-    namespace 'com.example.modernapp'
-    compileSdk 34
+    namespace = "com.example.myapplication"
+    compileSdk = 34
 
     defaultConfig {
-        applicationId 'com.example.modernapp'
-        minSdk 24 // A common minimum SDK for modern apps
-        targetSdk 34
-        versionCode 1
-        versionName "1.0"
+        applicationId = "com.example.myapplication"
+        minSdk = 24
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
-            useSupportLibrary true
+            useSupportLibrary = true
         }
     }
 
     buildTypes {
         release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
-        // Use Java 17 for modern Android projects with AGP 8+
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '17' // Must match sourceCompatibility
+        jvmTarget = "17"
     }
     buildFeatures {
-        viewBinding true // Enable View Binding for cleaner UI code
+        // Uncomment and set to true if you want to use View Binding
+        // viewBinding = true
+        // Uncomment and set to true if you want to use Data Binding
+        // dataBinding = true
     }
-    packagingOptions {
+    packaging {
         resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
 }
 
 dependencies {
-    // Android KTX Core
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.10.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    // Core AndroidX libraries
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.activity:activity-ktx:1.9.0") // For Activity Result APIs and KTX extensions
+    implementation("androidx.fragment:fragment-ktx:1.7.0") // For Fragment KTX extensions
 
-    // Activity KTX
-    implementation 'androidx.activity:activity-ktx:1.8.1'
-
-    // Kotlin Coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
-
-    // Lifecycle components (ViewModel, LiveData, Runtime)
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
-    // For lifecycle-aware coroutine scopes
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
-
-    // Navigation Component (optional, but highly recommended for single-activity architecture)
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.5'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.7.5'
-
-    // Hilt for Dependency Injection (optional, but a common choice for modern apps)
-    implementation 'com.google.dagger:hilt-android:2.48.1'
-    kapt 'com.google.dagger:hilt-compiler:2.48.1'
-
-    // Unit Testing
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'androidx.arch.core:core-testing:2.2.0' // For testing LiveData/ViewModels
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3' // For testing coroutines
-    testImplementation 'org.mockito:mockito-core:5.7.0' // Mocking framework
-
-    // Instrumentation Testing
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.48.1' // Hilt testing support
-    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.48.1' // Hilt compiler for androidTest
+    // Testing
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
