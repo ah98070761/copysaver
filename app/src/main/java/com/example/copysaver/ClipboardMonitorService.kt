@@ -4,7 +4,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
@@ -29,9 +28,7 @@ class ClipboardMonitorService : Service() {
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
-    // هذا السطر يمثل مدير قاعدة البيانات (Room Database) التي لم ننشئها بعد
-    // سنفترض وجودها مؤقتاً لتمرير خطأ التجميع
-    // lateinit var database: ClipEntryDatabase 
+    private lateinit var database: ClipEntryDatabase
 
     // مستمع الحافظة
     private val clipboardListener = object : ClipboardManager.OnPrimaryClipChangedListener {
@@ -39,11 +36,11 @@ class ClipboardMonitorService : Service() {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = clipboard.primaryClip
             if (clip != null && clip.itemCount > 0) {
+                // استخدام coerceToText للتأكد من التعامل مع أنواع النسخ المختلفة
                 val copiedText = clip.getItemAt(0).coerceToText(this@ClipboardMonitorService).toString()
                 
                 if (copiedText.isNotBlank()) {
                     Log.d(TAG, "New text copied: $copiedText")
-                    // سنقوم بحفظ النص في قاعدة البيانات هنا
                     saveClip(copiedText)
                 }
             }
@@ -54,10 +51,9 @@ class ClipboardMonitorService : Service() {
         super.onCreate()
         Log.d(TAG, "Service created.")
         
-        // هنا يمكن تهيئة قاعدة البيانات Room
-        // database = ClipEntryDatabase.getDatabase(applicationContext) 
+        // تهيئة قاعدة البيانات Room
+        database = ClipEntryDatabase.getDatabase(applicationContext) 
         
-        // إعداد قناة الإشعارات
         createNotificationChannel()
         
         // تشغيل الخدمة كخدمة في المقدمة
@@ -70,32 +66,27 @@ class ClipboardMonitorService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "Service started.")
-        // يجب أن تعود START_STICKY لإعادة تشغيل الخدمة في حال توقفها
         return START_STICKY 
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "Service destroyed.")
-        // إزالة مستمع الحافظة وإلغاء مهمة Coroutines
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboard.removePrimaryClipChangedListener(clipboardListener)
         job.cancel()
     }
 
-    // الدالة المسؤولة عن حفظ النص المنسوخ (يجب إضافة منطق Room هنا)
+    // الدالة المسؤولة عن حفظ النص المنسوخ
     private fun saveClip(text: String) {
-        // تشغيل عملية الحفظ في Coroutine
         scope.launch {
-            // هذا مجرد نموذج، سيتطلب إضافة فصول Room الفعلية (ClipEntry, ClipEntryDao)
-            Log.d(TAG, "Attempting to save: $text")
-            
-            /* // المنطق الفعلي للحفظ (يتطلب فصول Room)
             val newEntry = ClipEntry(content = text, timestamp = System.currentTimeMillis())
             database.clipDao().insert(newEntry)
-            */
+            
+            // للحفاظ على حجم قاعدة البيانات (حذف أقدم 500)
+            database.clipDao().clearOldClips() 
 
-            // تحديث الإشعار لإظهار أن العملية نجحت
+            // تحديث الإشعار
             val notification = buildNotification("تم حفظ نسخة جديدة", text.take(50) + "...")
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.notify(NOTIFICATION_ID, notification)
@@ -103,7 +94,6 @@ class ClipboardMonitorService : Service() {
     }
 
     private fun createNotificationChannel() {
-        // يجب إنشاء قناة الإشعارات على Android O أو أحدث
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = "CopySaver Monitoring"
             val descriptionText = "قناة إشعار دائمة لمراقبة الحافظة."
@@ -111,7 +101,6 @@ class ClipboardMonitorService : Service() {
             val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
                 description = descriptionText
             }
-            // تسجيل القناة مع النظام
             val notificationManager: NotificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
@@ -124,15 +113,17 @@ class ClipboardMonitorService : Service() {
             this,
             0,
             notificationIntent,
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT // استخدام FLAG_UPDATE_CURRENT للتحديث
         )
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(content)
-            .setSmallIcon(R.drawable.ic_launcher_foreground) // سيحدث خطأ ما لم يتم إنشاء ملف drawable
+            // 🛑 تم تغيير هذا السطر ليشير إلى المورد الجديد
+            .setSmallIcon(R.drawable.ic_notification_icon) 
             .setContentIntent(pendingIntent)
-            .setOngoing(true) // يجعل الإشعار دائمًا
+            .setOngoing(true) 
+            .setStyle(NotificationCompat.BigTextStyle().bigText(content)) // لعرض النص الكامل
             .build()
     }
 
