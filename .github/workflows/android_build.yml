@@ -31,7 +31,7 @@ jobs:
       - name: Ensure Gradle Wrapper JAR is present and up-to-date
         # This step explicitly runs the 'wrapper' task to ensure the gradle-wrapper.jar
         # is downloaded and available, addressing the "Could not find or load main class org.gradle.wrapper.GradleWrapperMain" error.
-        run: ./gradlew wrapper
+        run: bash ./gradlew wrapper
 
       - name: Assemble Debug Build
         run: bash ./gradlew assembleDebug
