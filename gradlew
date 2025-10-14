@@ -2,102 +2,79 @@
 
 ##############################################################################
 ##
-##  Gradle wrapper script for UNIX
+##  Gradle start up script for UN*X
 ##
 ##############################################################################
 
-# Attempt to set APP_HOME
-# Resolve links: $0 may be a link
-PRG="$0"
-APP_HOME=`dirname "$PRG"`
+# Set GRADLE_HOME to the directory where the gradle system is installed.
+# We assume that it is the directory in which this script resides.
+APP_BASE_NAME=`basename "$0"`
+APP_NAME="Gradle"
+APP_DIR=`dirname "$0"`
+APP_HOME=`cd "$APP_DIR"; pwd`
 
-# Need this for relative symlinks
-while [ -h "$PRG" ] ; do
-    LS=`ls -ld "$PRG"`
-    LINK=`expr "$LS" : '.*-> \(.*\)$'`
-    if expr "$LINK" : '/.*' > /dev/null; then
-        PRG="$LINK"
-    else
-        PRG=`dirname "$PRG"`/"$LINK"
+# Add default JVM options here. You may also use JAVA_OPTS and GRADLE_OPTS.
+DEFAULT_JVM_OPTS=""
+
+# Use the relevant OS component to find the Java binary.
+# On macOS, use /usr/bin/java which is a symlink to the current JDK's java binary.
+# On other OS, use the java binary found in JAVA_HOME or in the PATH.
+if [ -n "$JAVA_HOME" ] ; then
+    if [ -x "$JAVA_HOME/jre/bin/java" ] ; then
+        JAVACMD="$JAVA_HOME/jre/bin/java"
+    elif [ -x "$JAVA_HOME/bin/java" ] ; then
+        JAVACMD="$JAVA_HOME/bin/java"
     fi
+fi
+
+if [ -z "$JAVACMD" ] ; then
+    if [ `uname -s` = "Darwin" ] ; then
+        JAVACMD="/usr/bin/java"
+    else
+        JAVACMD=`which java`
+    fi
+fi
+
+if [ -z "$JAVACMD" ] ; then
+    echo "ERROR: JAVA_HOME is not set and no 'java' command can be found in your PATH."
+    echo "Please set the JAVA_HOME variable in your environment to match the location of your Java installation."
+    exit 1
+fi
+
+# Determine the Java version (major part)
+JAVA_VERSION=`"$JAVACMD" -version 2>&1 | sed -E -n 's/.*version "([0-9]*)\..*".*/\1/p'`
+
+# Default to 1.8 if Java version cannot be determined (should not happen with modern Java)
+if [ -z "$JAVA_VERSION" ]; then
+    JAVA_VERSION="8"
+fi
+
+# Define the wrapper jar and its path
+GRADLE_WRAPPER_JAR="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+
+# Check if wrapper jar exists
+if [ ! -f "$GRADLE_WRAPPER_JAR" ]; then
+    echo "ERROR: Cannot find wrapper jar '$GRADLE_WRAPPER_JAR'."
+    echo "Please ensure that the gradle-wrapper.jar is present in your project."
+    echo "If you're upgrading Gradle, you might need to run 'gradle wrapper' again."
+    exit 1
+fi
+
+# Set the classpath
+CLASSPATH="$GRADLE_WRAPPER_JAR"
+
+# Collect all arguments
+ARGS=()
+while [ "$#" -gt 0 ]; do
+    ARGS+=("$1")
+    shift
 done
 
-APP_HOME=`dirname "$PRG"`
-APP_HOME=`cd "$APP_HOME" && pwd`
-
-# OS specific support (must be 'true' or 'false').
-cygwin=false
-darwin=false
-mingw=false
-case "`uname`" in
-  CYGWIN*) cygwin=true ;;
-  Darwin*) darwin=true
-           if [ -z "$JAVA_HOME" ]; then
-             if [ -x '/usr/libexec/java_home' ]; then
-               export JAVA_HOME=`/usr/libexec/java_home`
-             elif [ -d '/Library/Java/Home' ]; then
-               export JAVA_HOME='/Library/Java/Home'
-             fi
-           fi
-           ;;
-  MINGW*) mingw=true ;;
-esac
-
-# For Darwin, add options to allow Java to be still run on older Java versions
-if $darwin; then
-  DEFAULT_JVM_OPTS="-Xdock:name=Gradle -Xdock:icon=\"$APP_HOME/gradle/wrapper/gradle-wrapper.jar\""
-fi
-
-# Determine the Java command to use to start the JVM.
-if [ -n "$JAVA_HOME" ] ; then
-  if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
-    # IBM's JDK on AIX uses "$JAVA_HOME/jre/sh/java" as the actual executable.
-    JAVA_CMD="$JAVA_HOME/jre/sh/java"
-  else
-    JAVA_CMD="$JAVA_HOME/bin/java"
-  fi
-  if [ ! -x "$JAVA_CMD" ] ; then
-    die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
-
-Please set the JAVA_HOME environment variable to the root directory of your Java installation."
-  fi
-else
-  JAVA_CMD="java"
-  # Check for Java in PATH
-  if [ ! `command -v $JAVA_CMD` ]; then
-    die "ERROR: JAVA_HOME is not set and no 'java' command can be found in your PATH.
-
-Please set the JAVA_HOME environment variable to the root directory of your Java installation (or alter your PATH environment variable to include the location of the 'java' executable)."
-  fi
-fi
-
-# Add default JVM options for better performance and memory management
-# Ensure this doesn't override user-defined options
-if [ -z "$DEFAULT_JVM_OPTS" ]; then
-  DEFAULT_JVM_OPTS="-Xmx1024m -Dfile.encoding=UTF-8" # Example: 1GB max heap, UTF-8 encoding
-fi
-
-# The Java system properties and classpath for the wrapper.
-# These will be passed to the JVM that runs the wrapper.
-GRADLE_OPTS=""
-if [ -f "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" ] ; then
-  CLASSPATH="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
-else
-  die "ERROR: Cannot find $APP_HOME/gradle/wrapper/gradle-wrapper.jar
-This might indicate a corrupted Gradle distribution. If this is a project that uses the Gradle wrapper, please try to delete the '$APP_HOME/gradle' folder and re-run your build to download a fresh one."
-fi
-
-# Stop compiling in-process on older Android Gradle Plugin versions, as they can conflict
-# with newer Gradle versions (e.g. Kotlin compiler version mismatches)
-# This check is not strictly necessary for modern projects, but harmless.
-if [ -n "$ANDROID_GRADLE_PLUGIN_VERSION" ] && [ "$(printf '%s\n' "3.6.0" "$ANDROID_GRADLE_PLUGIN_VERSION" | sort -V | head -n1)" = "3.6.0" ] && [ "$(printf '%s\n' "4.0.0" "$ANDROID_GRADLE_PLUGIN_VERSION" | sort -V | head -n1)" != "4.0.0" ]; then
-    DEFAULT_JVM_OPTS="$DEFAULT_JVM_OPTS -Dorg.gradle.daemon.profile=false -Dorg.gradle.parallel=true -Dorg.gradle.internal.launcher.welcome=full -Dorg.gradle.jvmargs=\"-Xmx1536M -Dfile.encoding=UTF-8 -XX:+HeapDumpOnOutOfMemoryError\" -Dorg.gradle.workers.max=4 -Dorg.gradle.configureondemand=true"
-fi
-
-
-# Main class
-MAIN_CLASS="org.gradle.wrapper.GradleWrapperMain"
-
-# Collect all arguments for the Java command
-# This allows users to pass JVM options via JAVA_OPTS
-exec "$JAVA_CMD" $DEFAULT_JVM_OPTS $JAVA_OPTS -classpath "$CLASSPATH" "$MAIN_CLASS" "$@"
+# Launch the JVM
+exec "$JAVACMD" \
+    "${DEFAULT_JVM_OPTS}" \
+    "${JAVA_OPTS}" \
+    "${GRADLE_OPTS}" \
+    "-classpath" "$CLASSPATH" \
+    "org.gradle.wrapper.GradleWrapperMain" \
+    "${ARGS[@]}"
