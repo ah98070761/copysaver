@@ -24,6 +24,12 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: wrapper
+          # The build log indicates issues with cache restoration and saving.
+          # Explicitly disabling the cache can force a fresh download of the Gradle distribution
+          # if the wrapper JAR is missing or corrupted, potentially resolving
+          # "ClassNotFoundException: org.gradle.wrapper.GradleWrapperMain" errors
+          # which can occur if the distribution isn't properly acquired.
+          cache-disabled: true 
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
