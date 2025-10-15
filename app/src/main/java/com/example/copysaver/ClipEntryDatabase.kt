@@ -24,7 +24,10 @@ abstract class ClipEntryDatabase : RoomDatabase() {
                     context.applicationContext,
                     ClipEntryDatabase::class.java,
                     "clip_db"
-                ).build()
+                )
+                // 🛑 التعديل هنا: إضافة fallbackToDestructiveMigration لضمان عدم توقف التطبيق بسبب تغييرات في المخطط
+                .fallbackToDestructiveMigration()
+                .build()
                 INSTANCE = instance
                 instance
             }
