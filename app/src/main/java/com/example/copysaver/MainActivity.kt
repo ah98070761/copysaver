@@ -1,8 +1,7 @@
-// File: app/src/main/java/com/example/copysaver/MainActivity.kt
-
 package com.example.copysaver
 
 import android.content.Intent
+import android.os.Build // 🛑 تم إضافة هذا الاستيراد
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,16 +12,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.copysaver.ui.theme.CopySaverTheme // استيراد التنسيق الصحيح
+import com.example.copysaver.ui.theme.CopySaverTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        // تشغيل خدمة الخلفية فوراً
-        // يتم استخدام startService في حالتنا، ويمكن استخدام startForegroundService في الإصدارات الأحدث
-        startService(Intent(this, ClipboardMonitorService::class.java))
-        
+
+        // 🛑 التعديل هنا: استخدام startForegroundService للإصدارات الحديثة
+        val serviceIntent = Intent(this, ClipboardMonitorService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent)
+        } else {
+            startService(serviceIntent)
+        }
+        // نهاية التعديل
+
         setContent {
             CopySaverTheme {
                 Surface(
