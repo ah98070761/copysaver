@@ -1,3 +1,5 @@
+// File: app/src/main/java/com/example/copysaver/ClipboardMonitorService.kt
+
 package com.example.copysaver
 
 import android.app.NotificationChannel
@@ -15,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import android.app.Notification // 🛑 هذا هو السطر الذي تمت إضافته
 
 /**
  * خدمة Android تعمل في المقدمة لمراقبة الحافظة وحفظ المحتوى المنسوخ.
