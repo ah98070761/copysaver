@@ -17,7 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import android.app.Notification // 🛑 هذا هو السطر الذي تمت إضافته
+import android.app.Notification // هذا الاستيراد أصبح ضرورياً لتجنب اللبس في الدالة startForeground
 
 /**
  * خدمة Android تعمل في المقدمة لمراقبة الحافظة وحفظ المحتوى المنسوخ.
@@ -41,7 +41,7 @@ class ClipboardMonitorService : Service() {
             if (clip != null && clip.itemCount > 0) {
                 // استخدام coerceToText للتأكد من التعامل مع أنواع النسخ المختلفة
                 val copiedText = clip.getItemAt(0).coerceToText(this@ClipboardMonitorService).toString()
-                
+
                 if (copiedText.isNotBlank()) {
                     Log.d(TAG, "New text copied: $copiedText")
                     saveClip(copiedText)
@@ -53,12 +53,12 @@ class ClipboardMonitorService : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "Service created.")
-        
+
         // تهيئة قاعدة البيانات Room
         database = ClipEntryDatabase.getDatabase(applicationContext) 
-        
+
         createNotificationChannel()
-        
+
         // تشغيل الخدمة كخدمة في المقدمة
         startForeground(NOTIFICATION_ID, buildNotification("CopySaver يعمل في الخلفية", "يراقب الحافظة..."))
 
@@ -85,7 +85,7 @@ class ClipboardMonitorService : Service() {
         scope.launch {
             val newEntry = ClipEntry(content = text, timestamp = System.currentTimeMillis())
             database.clipDao().insert(newEntry)
-            
+
             // للحفاظ على حجم قاعدة البيانات (حذف أقدم 500)
             database.clipDao().clearOldClips() 
 
@@ -109,8 +109,9 @@ class ClipboardMonitorService : Service() {
             notificationManager.createNotificationChannel(channel)
         }
     }
-    
-    private fun buildNotification(title: String, content: String): NotificationCompat.Notification {
+
+    // 🛑 التعديل هنا: تم تغيير نوع الإرجاع إلى android.app.Notification
+    private fun buildNotification(title: String, content: String): Notification {
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
             this,
